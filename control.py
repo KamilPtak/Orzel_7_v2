@@ -20,30 +20,47 @@ class WirelesControl():
                                     'Button RT', 'Button LT',                 # change speed events
                                     'Button RB', 'Button LB']                 # stop events
 
+        self.events_group_rotate = ['Button X', 'Button B']
+        self.events_group_emergency = ['Button start', 'Button select']
+
+
+
     def calculate_pwm(self, event) -> list:
-        self._calculate_steer(event)
+        event_type = self._calculate_steer(event)
 
         self.motors_pwm[0] = (self.x_axis + self.y_axis) * self.speed
         self.motors_pwm[1] = (-1 * self.x_axis + self.y_axis) * self.speed
         self.motors_pwm[2] = (-1 * self.x_axis + -1 * self.y_axis) * self.speed
         self.motors_pwm[3] = (self.x_axis + -1 * self.y_axis) * self.speed
 
-        return self.motors_pwm
+        return event_type, self.motors_pwm
 
-    def _calculate_steer(self, event) -> None:
+    def _calculate_steer(self, event):
         if event['button'] == 'Button select' and event['value'] == 1:
             self.knob_mode_enabled = not self.knob_mode_enabled
             print("Steer control by knob enabled: ", self.knob_mode_enabled)
 
         if event['button'] in self.events_group_knob and self.knob_mode_enabled:
             self._parse_knob_control(event)
+            return 'control'
+        
         elif event['button'] in self.events_group_arrows:
             self._parse_arrows_control(event)
+            return 'control'
+        
+        elif event['button'] in self.events_group_rotate:
+            res = 'rotate right' if event['button'] == 'Button B' else 'rotate left'
+            return res
+
+        elif event['button'] in self.events_group_emergency:
+            return 'stop'
+    
         else:
             if event['button'] != 'Button select':
                 print("Unknown event: ", event)
+            return 'nothing'
 
-    def _parse_knob_control(self, event) -> None:
+    def _parse_knob_control(self, event):
         if event['button'] == 'Axis Left X':
             event['value'] -= 128
             self.x_axis = 0 if event['value'] in self.dead_space else event['value']/128
@@ -56,7 +73,7 @@ class WirelesControl():
             self.x_axis = 0
             self.y_axis = 0
 
-    def _parse_arrows_control(self, event) -> None:
+    def _parse_arrows_control(self, event):
         if event['button'] == 'Horizontal arrows':
             self.y_axis = 0
             self.x_axis = 0

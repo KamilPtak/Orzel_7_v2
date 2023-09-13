@@ -1,4 +1,7 @@
 from smbus import SMBus
+from cyclic_timer import CyclicTimer
+from filter import MovingAverageFilter
+import math
 
 class MPU6050:
     def __init__(self) -> None:
@@ -17,6 +20,18 @@ class MPU6050:
         self.bus = SMBus(1)
         self.device_address = 0x68
         self.initial_config()
+
+        self.arx = 0
+        self.arx = 0
+        self.arx = 0
+        self.grx = 0
+        self.gry = 0
+        self.grz = 0
+
+        self.period = 0.2
+        self.angle_timer = CyclicTimer(self.period, self._track_angle)
+        self.angle_timer.start()
+
 
     def initial_config(self):
         self.bus.write_byte_data(self.device_address, self.SMPLRT_DIV, 7)   #Write to sample rate register    
@@ -54,7 +69,7 @@ class MPU6050:
         return value
     
     def get_data_to_log(self, sensor_type):
-        self.update_data()
+        self.read_data(sensor_type)
         if sensor_type == 'accel':
             return "AccX:" + str(self.accel_list[0]) + " AccY:" + str(self.accel_list[1]) + " AccZ:" + str(self.accel_list[2])
         elif sensor_type == 'gyro':
@@ -62,6 +77,27 @@ class MPU6050:
         else:
             print("Wrong sensor type")
 
-    def update_data(self):
-        self.read_data('accel')
+
+    def _track_angle(self):
         self.read_data('gyro')
+        self.grz += round((self.gyro_list[2] - 0.04) * self.period )
+
+    # def _get_angle(self):
+    #     self.read_data('accel')
+
+    #     ax = self.accel_list[0]
+    #     ay = self.accel_list[1]
+    #     az = self.accel_list[2]
+
+    #     self.arx = (180/math.pi) * math.atan(ax / math.sqrt(math.pow(ay, 2) + math.pow(az, 2)))
+    #     self.ary = (180/math.pi) * math.atan(ay / math.sqrt(math.pow(ax, 2) + math.pow(az, 2)))
+    #     self.arz = (180/math.pi) * math.atan(math.sqrt(math.pow(ay, 2) + math.pow(ax, 2)) / az)
+
+    #     self.grx += (self.period * ax)
+    #     self.gry += (self.period * ay)
+    #     self.grz += (self.period * az)
+
+    #     rx = (0.96 * self.arx) + (0.04 * self.grx)
+    #     ry = (0.96 * self.ary) + (0.04 * self.gry)
+    #     rz = (0.96 * self.arz) + (0.04 * self.grz)
+

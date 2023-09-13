@@ -13,5 +13,4 @@ class MovingAverageFilter:
             return None 
         return sum(self.buffer) / len(self.buffer)
 
-filter = MovingAverageFilter(window_size=10)
 

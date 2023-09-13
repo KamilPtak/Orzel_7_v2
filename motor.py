@@ -67,6 +67,15 @@ class Motor:
             GPIO.output(self.pin1, GPIO.HIGH)
             GPIO.output(self.pin2, GPIO.LOW)
 
+    def rotate(self, dir):
+        self.pwm.set_pwm(self.enable, 0, 2000)
+        if dir == 'R':
+            GPIO.output(self.pin1, GPIO.HIGH)
+            GPIO.output(self.pin2, GPIO.LOW)
+        else:
+            GPIO.output(self.pin1, GPIO.LOW)
+            GPIO.output(self.pin2, GPIO.HIGH)
+
     def stop(self):
         self.pwm.set_pwm(self.enable, 0, self._max_duty)
         GPIO.output(self.pin1, GPIO.LOW)

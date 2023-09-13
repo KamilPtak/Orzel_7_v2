@@ -28,10 +28,9 @@ Imu = MPU6050()
 
 def logg_data():
     while True:
-        Imu.update_data()
         Logging.acc_call(Imu.get_data_to_log('accel'))
-        Logging.gyro_call(Imu.get_data_to_log('gyro'))
-        print(Imu.get_data_to_log('gyro'))
+        # Logging.gyro_call(Imu.get_data_to_log('gyro'))
+        # print(Imu.get_data_to_log('gyro'))
         # Logger.pid_call()
         sleep(0.5)
 loging_loop = threading.Thread(target=logg_data)
@@ -48,30 +47,37 @@ loging_loop.start()
 # input_loop = threading.Thread(target=input)
 # input_loop.start()
 
-# Motor1.set_setpoint(50)
-# Motor2.set_setpoint(50)
-# Motor3.set_setpoint(50)
-# Motor4.set_setpoint(50)
-
-# Motor1.set_setpoint(-150)
-# Motor2.set_setpoint(-150)
-# Motor3.set_setpoint(-150)
-# Motor4.set_setpoint(-150)
-
-# Motor1.set_setpoint(0)
-# Motor2.set_setpoint(0)
-# Motor3.set_setpoint(0)
-# Motor4.set_setpoint(0)
-
 while True:
     event = gamepad.catch_event()
-    if event:
-        pwmsValuesList = Control.calculate_pwm(event)
 
-        Motor1.set_setpoint(pwmsValuesList[0])
-        Motor2.set_setpoint(pwmsValuesList[1])
-        Motor3.set_setpoint(pwmsValuesList[2])
-        Motor4.set_setpoint(pwmsValuesList[3])
+    if event:
+        action_type, pwmsValuesList = Control.calculate_pwm(event)
+
+        # res = Control.calculate_pwm(event)
+        # print(res)
+
+        if action_type == 'control':
+            Motor1.set_setpoint(pwmsValuesList[0])
+            Motor2.set_setpoint(pwmsValuesList[1])
+            Motor3.set_setpoint(pwmsValuesList[2])
+            Motor4.set_setpoint(pwmsValuesList[3])
+        elif action_type == 'rotate right':
+            Motor1.rotate('R')
+            Motor2.rotate('R')
+            Motor3.rotate('R')
+            Motor4.rotate('R')
+        elif action_type == 'rotate left':
+            Motor1.rotate('L')
+            Motor2.rotate('L')
+            Motor3.rotate('L')
+            Motor4.rotate('L')
+        elif action_type == 'stop':
+            Motor1.stop()
+            Motor2.stop()
+            Motor3.stop()
+            Motor4.stop()
+        else:
+            pass
 
         print(pwmsValuesList)
         event.clear()
