@@ -13,7 +13,6 @@ def catch_event():
     try:
         device_event = {}
         for event in device.read():
-
             if event.type == evdev.ecodes.EV_KEY and event.value:
                 if('BTN_X' in evdev.ecodes.BTN[event.code]):
                     device_event = {'button':'Button X',

@@ -28,10 +28,10 @@ class Logger(object):
         gyro_logger[0].info(str(data))
         self.remove_handler(gyro_logger[0], gyro_logger[1])
 
-    # def current_call(self, data):
-    #     curr_logger = self.extendable_logger('current_logs', 'current.txt')
-    #     curr_logger[0].info(str(data))
-    #     self.remove_handler(curr_logger[0], curr_logger[1])
+    def current_call(self, data):
+        curr_logger = self.extendable_logger('current_logs', 'current.txt')
+        curr_logger[0].info(str(data))
+        self.remove_handler(curr_logger[0], curr_logger[1])
     
     def pid_call(self, data):
         pid_logger = self.extendable_logger('Pid', 'pid.txt')

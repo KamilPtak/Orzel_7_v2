@@ -1,7 +1,6 @@
 import smbus
 import time
 
-
 class WirelesControl(): 
     def __init__(self):
         self.x_axis = 0
@@ -22,8 +21,6 @@ class WirelesControl():
 
         self.events_group_rotate = ['Button X', 'Button B']
         self.events_group_emergency = ['Button start', 'Button select']
-
-
 
     def calculate_pwm(self, event) -> list:
         event_type = self._calculate_steer(event)
@@ -120,4 +117,3 @@ class OnboardControl():
                                      force=None)
         
         self.calculate_pwm(data)
-

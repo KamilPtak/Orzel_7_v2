@@ -41,14 +41,14 @@ class Motor:
         self.rpm_timer.start()
 
         #PID controler related defines
-        self.kp = 0.8
-        self.ki = 0.2
+        self.kp = 0.7
+        self.ki = 0.12
         self.kd = 0.015
         self.output = 0
         self.setpoint = 0
 
         self.pid = PIDController(kp=self.kp, ki=self.ki, kd=self.kd)
-        self.pid_timer = CyclicTimer(0.15, self._pid_callback)
+        self.pid_timer = CyclicTimer(0.25, self._pid_callback)
         self.pid_timer.start()
 
     def run(self, control):
@@ -107,7 +107,5 @@ class Motor:
         self.output = self.pid.compute(self.filter.get_average())
         self.run(self.output)
 
-    def get_log_data__(self):
-        return "RPM: " + str(self.rpm) + " CTR: " + str(self.output) + " STP: " + str(self.setpoint)
-
-
+    def get_log_data(self):
+        return "RPM: " + str(round(self.rpm, 2)) + " CTR: " + str(round(self.output, 2)) + " STP: " + str(round(self.setpoint, 2))

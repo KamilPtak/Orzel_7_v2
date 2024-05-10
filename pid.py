@@ -10,21 +10,17 @@ class PIDController:
 
     def compute(self, current_value):
         error = self.setpoint - current_value
-
         P = self.kp * error
         self.integral +=  (error + error * self.dt)
         I = self.ki * self.integral
 
         delta_error = (error - self.prev_error)
         D = self.kd * delta_error
-
         output = P + I + D
-
         self.prev_error = error
 
         return output
-    
-    
+
     def set_setpoint(self, new_setpoint):
         self.prev_error = 0
         self.integral = 0

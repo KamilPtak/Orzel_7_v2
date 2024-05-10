@@ -21,6 +21,7 @@ Motor1 = Motor(pin1=6, pin2=13, enable=16, encPinA=26, encPinB=19, motorId=1, pw
 Motor2 = Motor(pin1=21, pin2=20, enable=15 ,encPinA=16, encPinB=12, motorId=2, pwm=pwmobject)
 Motor3 = Motor(pin1=27, pin2=17, enable=1, encPinA=14, encPinB=15, motorId=3, pwm=pwmobject)
 Motor4 = Motor(pin1=23, pin2=24, enable=2,encPinA=8, encPinB=25, motorId=4, pwm=pwmobject)
+motor_list = [Motor1, Motor2, Motor3, Motor4]
 
 Control = control.WirelesControl()
 Logging = Logger()
@@ -30,22 +31,10 @@ def logg_data():
     while True:
         Logging.acc_call(Imu.get_data_to_log('accel'))
         # Logging.gyro_call(Imu.get_data_to_log('gyro'))
-        # print(Imu.get_data_to_log('gyro'))
-        # Logger.pid_call()
-        sleep(0.5)
+        # Logging.pid_call(Motor4.get_log_data())
+        sleep(0.2)
 loging_loop = threading.Thread(target=logg_data)
 loging_loop.start()
-
-# steer = 0
-
-# def input():
-#     global steer
-#     while True:
-#         steer_tmp = input('Input steer: ')
-#         Motor1.set_setpoint(int(steer_tmp))
-#         sleep(1)
-# input_loop = threading.Thread(target=input)
-# input_loop.start()
 
 while True:
     event = gamepad.catch_event()
@@ -53,31 +42,17 @@ while True:
     if event:
         action_type, pwmsValuesList = Control.calculate_pwm(event)
 
-        # res = Control.calculate_pwm(event)
-        # print(res)
-
-        if action_type == 'control':
-            Motor1.set_setpoint(pwmsValuesList[0])
-            Motor2.set_setpoint(pwmsValuesList[1])
-            Motor3.set_setpoint(pwmsValuesList[2])
-            Motor4.set_setpoint(pwmsValuesList[3])
-        elif action_type == 'rotate right':
-            Motor1.rotate('R')
-            Motor2.rotate('R')
-            Motor3.rotate('R')
-            Motor4.rotate('R')
-        elif action_type == 'rotate left':
-            Motor1.rotate('L')
-            Motor2.rotate('L')
-            Motor3.rotate('L')
-            Motor4.rotate('L')
-        elif action_type == 'stop':
-            Motor1.stop()
-            Motor2.stop()
-            Motor3.stop()
-            Motor4.stop()
-        else:
-            pass
+        for motor in motor_list:
+            if action_type == 'control':
+                motor.set_setpoint(pwmsValuesList[motor.motorId])
+            elif action_type == 'rotate right':
+                motor.rotate('R')
+            elif action_type == 'rotate left':
+                motor.rotate('L')
+            elif action_type == 'stop':
+                motor.stop()
+            else:
+                pass
 
         print(pwmsValuesList)
         event.clear()

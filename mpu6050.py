@@ -1,7 +1,5 @@
 from smbus import SMBus
 from cyclic_timer import CyclicTimer
-from filter import MovingAverageFilter
-import math
 
 class MPU6050:
     def __init__(self) -> None:
@@ -31,7 +29,6 @@ class MPU6050:
         self.period = 0.2
         self.angle_timer = CyclicTimer(self.period, self._track_angle)
         self.angle_timer.start()
-
 
     def initial_config(self):
         self.bus.write_byte_data(self.device_address, self.SMPLRT_DIV, 7)   #Write to sample rate register    
@@ -77,10 +74,12 @@ class MPU6050:
         else:
             print("Wrong sensor type")
 
-
     def _track_angle(self):
         self.read_data('gyro')
         self.grz += round((self.gyro_list[2] - 0.04) * self.period )
+
+    # Very fine but unused function
+    # import math
 
     # def _get_angle(self):
     #     self.read_data('accel')
